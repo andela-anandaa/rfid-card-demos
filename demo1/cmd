@@ -1,0 +1,18 @@
+#!/usr/bin/env node
+
+const basic = require('./basic')
+const { setup } = require('./db')
+
+
+const cmd = process.argv[2]
+
+const cmdMap = {
+  setup,
+  enroll: basic.enrollUsers,
+  list: basic.listUsers,
+  run: basic.run,
+}
+
+// run
+if (cmdMap[cmd]) cmdMap[cmd]()
+else console.error(`No such command ${cmd ? `as ${cmd}` : ''}`)
