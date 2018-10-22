@@ -23,8 +23,6 @@ const enrollUsers = async () => {
       })
     }
   })
-
-  rl.close()
 }
 
 const listUsers = async () => {
@@ -36,8 +34,8 @@ const listUsers = async () => {
 }
 
 const getUser = async (rfid) => {
-  const user = await getUsers(rfid)
-  console.log(user)
+  const [ user ] = await getUsers(rfid)
+  return user
 }
 
 const isValidID = (id) => id.length == 18
@@ -50,15 +48,27 @@ const run = (cb) => {
   })
 
   const q = (cb) => {
-    rl.question(chalk.green.bold('Andela.BASIC> '), (input) => {
+    rl.question(chalk.green.bold('Andela.BASIC> '), async (input) => {
       // for now
       if (isValidID(input)) {
-        console.info(chalk.yellow(' ✓ valid ID'))
         // if user not found, enroll them
         // if found, run callback
+        const id = input.substr(10)
+        const user = await getUser(id)
+        if (user) {
+          console.log(chalk.yellow.bold(`${user.name}`), `| ${user.rfid}`)
+        } else {
+          // register/enroll
+          console.log(chalk.red('User not found, enroll user.'))
+          rl.question('Name: ', (name) => {
+            if (name.length < 3) return console.error(`Invalid name`)
+            // store to db
+            return addUser(id, name)
+          })
+        }
       }
       else if (input.toLowerCase() == 'exit') process.exit()
-      else console.log('not a valid ID')
+      else console.log(chalk.red('Not valid ID'))
       q(cb)
     })
   }

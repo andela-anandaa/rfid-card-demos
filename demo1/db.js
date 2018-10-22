@@ -36,11 +36,11 @@ const addUser = (rfid, name) => {
 
 const getUsers = (rfid) => {
   const p = new Promise((resolve, reject) => {
-    db.all(`SELECT * FROM users ${rfid ? `WHERE rfid = '${rfid}'` : ''}`, (err, data) => {
+    const sql = `SELECT * FROM users ${rfid ? `WHERE rfid = '${rfid}'` : ''}`
+    db.all(sql, (err, data) => {
       if (err) reject(err)
       else resolve(data)
     })
-    db.close()
   })
   return p
 }
